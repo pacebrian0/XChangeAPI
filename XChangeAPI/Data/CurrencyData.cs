@@ -7,9 +7,9 @@ namespace XChangeAPI.Data
 {
     public class CurrencyData : BaseDatabase, ICurrencyData
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<CurrencyData> _logger;
 
-        public CurrencyData(IConfiguration config, ILogger logger) : base(config)
+        public CurrencyData(IConfiguration config, ILogger<CurrencyData> logger) : base(config)
         {
             _logger = logger;
         }

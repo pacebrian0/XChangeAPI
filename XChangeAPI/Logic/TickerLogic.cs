@@ -1,14 +1,21 @@
 ﻿using XChangeAPI.Data.Interfaces;
 using XChangeAPI.Logic.Interfaces;
 using XChangeAPI.Models.DB;
+using XChangeAPI.Services.Interfaces;
 
 namespace XChangeAPI.Logic
 {
-    public class TickerLogic:ITickerLogic
+    public class TickerLogic : ITickerLogic
     {
         private readonly ITickerData _data;
-        public TickerLogic(ITickerData data) {
+        private readonly IExchangeRateService _exchange;
+        private readonly ILogger<TickerLogic> _log;
+
+        public TickerLogic(ITickerData data, IExchangeRateService exchangeservice, ILogger<TickerLogic> log)
+        {
             _data = data;
+            _exchange = exchangeservice;
+            _log = log;
         }
 
         public async Task<IEnumerable<Ticker>> GetTickers()
@@ -16,23 +23,29 @@ namespace XChangeAPI.Logic
             return await _data.GetTickers();
         }
 
-        public async Task<Ticker> GetExchangeRate(string curr1, string curr2)
+        public async Task<Ticker> GetExchangeRate(Currency curr1, Currency curr2)
         {
-            return await _data.GetExchangeRate(curr1, curr2);
+            return await _data.GetExchangeRate(curr1.abbreviation, curr2.abbreviation);
         }
 
-        public async Task<float> Exchange(string curr1, string curr2, float amt)
+        public async Task<float> Exchange(Currency curr1, Currency curr2, float amt)
         {
             var exchangerate = await GetExchangeRate(curr1, curr2);
-            if((DateTime.Now - DateTime.Parse(exchangerate.checkedOn)).Minutes >= 30)
+
+            if ((int)DateTime.UtcNow.Subtract(exchangerate.checkedOn).TotalMinutes >= 30)
             {
-                //Update Exchange Rate
+                var newExchangeRate = await _exchange.GetExchangeRateFromAPI(curr1, curr2);
+                exchangerate.exchangerate = newExchangeRate;
+
             }
             return amt * exchangerate.exchangerate;
 
         }
 
+        public async Task UpdateExchangeRate(Currency curr1, Currency curr2, float rate)
+        {
 
+        }
 
 
 

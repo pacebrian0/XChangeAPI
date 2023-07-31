@@ -5,11 +5,11 @@ using XChangeAPI.Models.DB;
 
 namespace XChangeAPI.Data
 {
-    public class UserData: BaseDatabase, IUserData
+    public class UserData : BaseDatabase, IUserData
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<UserData> _logger;
 
-        public UserData(IConfiguration config, ILogger logger) : base(config)
+        public UserData(IConfiguration config, ILogger<UserData> logger) : base(config)
         {
             _logger = logger;
         }
@@ -55,8 +55,8 @@ namespace XChangeAPI.Data
                                         `User`.`createdBy`,
                                         `User`.`modifiedOn`,
                                         `User`.`modifiedBy`,
-                                        `User`.`password_hash` as passwordHash
-                                    FROM `conciergedb`.`User`
+                                        `User`.`passwordhash` 
+                                    FROM `TICKER`.`USER`
                                     WHERE id=@id
                                     ";
                 using (var conn = new MySqlConnection(_dbConn))
@@ -85,8 +85,8 @@ namespace XChangeAPI.Data
                                         `User`.`createdBy`,
                                         `User`.`modifiedOn`,
                                         `User`.`modifiedBy`,
-                                        `User`.`password_hash` as passwordHash
-                                    FROM `conciergedb`.`User`
+                                        `User`.`passwordhash`
+                                    FROM `TICKER`.`USER`
                                     WHERE email=@email
                                     ";
                 using (var conn = new MySqlConnection(_dbConn))
@@ -108,7 +108,7 @@ namespace XChangeAPI.Data
             try
             {
                 const string sql = @"
-                            INSERT INTO `conciergedb`.`User`
+                            INSERT INTO `TICKER`.`USER`
                             (
                             `name`,
                             `surname`,
@@ -117,7 +117,7 @@ namespace XChangeAPI.Data
                             `createdBy`,
                             `modifiedOn`,
                             `modifiedBy`,
-                            `password_hash`)
+                            `passwordhash`)
                             VALUES
                             (
                             @name,
@@ -128,7 +128,7 @@ namespace XChangeAPI.Data
                             UTC_TIMESTAMP(),
                             0,
                             @passwordHash); 
-                            SELECT id from `conciergedb`.`User` where email = @email;";
+                            SELECT id from `TICKER`.`USER` where email = @email;";
 
                 using (var conn = new MySqlConnection(_dbConn))
                 {
@@ -147,12 +147,12 @@ namespace XChangeAPI.Data
 
 
 
-        public async Task UpdateUser(User user, bool local)
+        public async Task UpdateUser(User user)
         {
             try
             {
                 const string sql = @"
-                            UPDATE `conciergedb`.`User`
+                            UPDATE `TICKER`.`USER`
                             SET `name` = @name,
                                 `surname` = @surname,
                                 `email` = @email,
@@ -174,12 +174,12 @@ namespace XChangeAPI.Data
 
         }
 
-        public async Task DeleteUser(User user, bool local)
+        public async Task DeleteUser(User user)
         {
             try
             {
                 const string sql = @"
-                            DELETE FROM `conciergedb`.`User`
+                            DELETE FROM `TICKER`.`USER`
                             WHERE id = @id";
                 using (var conn = new MySqlConnection(_dbConn))
                 {

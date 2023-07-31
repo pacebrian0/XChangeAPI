@@ -7,9 +7,9 @@
         public string surname { get; set; }
         public string email { get; set; }
         public char status { get; set; }
-        public string createdOn { get; set; }
+        public DateTime createdOn { get; set; }
         public int createdBy { get; set; }
-        public string modifiedOn { get; set; }
+        public DateTime modifiedOn { get; set; }
         public int modifiedBy { get; set; }
         public string passwordhash { get; set; }
     }

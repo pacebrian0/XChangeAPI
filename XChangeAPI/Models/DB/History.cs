@@ -6,7 +6,7 @@
 
         public int ticker { get; set; }
         public int user { get; set; }
-        public string timestamp { get; set; }
+        public DateTime timestamp { get; set; }
         public char status { get; set; }
 
     }

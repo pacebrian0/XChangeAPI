@@ -7,9 +7,9 @@ namespace XChangeAPI.Data
 {
     public class TickerData : BaseDatabase, ITickerData
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<TickerData> _logger;
 
-        public TickerData(IConfiguration config, ILogger logger) : base(config)
+        public TickerData(IConfiguration config, ILogger<TickerData> logger) : base(config)
         {
             _logger = logger;
         }
@@ -83,6 +83,36 @@ namespace XChangeAPI.Data
         }
 
 
-        
+        public async Task UpdateExchangeRate(string curr1, string curr2, float amt)
+        {
+
+            if (string.IsNullOrEmpty(curr1))
+            {
+                throw new ArgumentException(nameof(curr1));
+            }
+
+            if (curr2 is null)
+            {
+                throw new ArgumentNullException(nameof(curr2));
+            }
+
+            const string sql = @"UPDATE `conciergedb`.`TICKER`
+                                    SET `exchangerate` = @amt,
+                                        `modifiedOn` = UTC_TIMESTAMP(),
+                                        `modifiedBy` = @modifiedBy
+                                    WHERE `TICKER`.`currency1` = @curr1
+                                    AND   `TICKER`.`currency2` = @curr2";
+
+            using (var conn = new MySqlConnection(_dbConn))
+            {
+                await conn.ExecuteAsync(sql, new { curr1, curr2, modifiedBy = 1, amt });
+            }
+
+        }
+
+
+
     }
+
+
 }
