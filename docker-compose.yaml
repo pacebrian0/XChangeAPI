@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  xchangeapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: xchangeapi
+    ports:
+      - 8083:80
+
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+
+    networks:
+      network:
+        ipv4_address: 10.2.0.6
+
+
+networks:
+  network:
+    name: xchangenetwork
+    external: true
+
+    

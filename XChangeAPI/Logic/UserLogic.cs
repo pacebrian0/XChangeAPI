@@ -1,6 +1,11 @@
-﻿using XChangeAPI.Data.Interfaces;
+﻿using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using XChangeAPI.Data.Interfaces;
 using XChangeAPI.Logic.Interfaces;
 using XChangeAPI.Models.DB;
+using XChangeAPI.Services.Interfaces;
 
 namespace XChangeAPI.Logic
 {
@@ -44,5 +49,7 @@ namespace XChangeAPI.Logic
         {
             await _data.DeleteUser(user);
         }
+
+
     }
 }

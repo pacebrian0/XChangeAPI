@@ -20,7 +20,7 @@ namespace XChangeAPI.Services
 
         }
 
-        public async Task<float> GetExchangeRateFromAPI(Currency curr1, Currency curr2)
+        public async Task<float> GetExchangeRateFromAPI(string curr1, string curr2)
         {
             if (curr1 is null)
             {
@@ -32,7 +32,7 @@ namespace XChangeAPI.Services
                 throw new ArgumentNullException(nameof(curr2));
             }
 
-            var url = $"{baseURL}?access_key={_apiKey}&base={curr1.abbreviation}&symbols={curr2.abbreviation}";
+            var url = $"{baseURL}?access_key={_apiKey}&base={curr1}&symbols={curr2}";
             var client = new HttpClient();
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             var response = await client.SendAsync(request);
@@ -40,7 +40,7 @@ namespace XChangeAPI.Services
             var result = await response.Content.ReadAsStringAsync();
             Console.WriteLine(result);
             FixerExchange exchangeRates = JsonConvert.DeserializeObject<FixerExchange>(result) ?? throw new Exception("Invalid JSON response in GetExchangeRate");
-            return exchangeRates.rates[curr1.abbreviation];
+            return exchangeRates.rates[curr2];
 
         }
 

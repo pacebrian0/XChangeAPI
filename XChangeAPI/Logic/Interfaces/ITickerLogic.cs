@@ -4,9 +4,7 @@ namespace XChangeAPI.Logic.Interfaces
 {
     public interface ITickerLogic
     {
-        Task<float> Exchange(Currency curr1, Currency curr2, float amt);
-        Task<Ticker> GetExchangeRate(Currency curr1, Currency curr2);
-        Task<IEnumerable<Ticker>> GetTickers();
-        Task UpdateExchangeRate(Currency curr1, Currency curr2, float rate);
+        Task<float?> Exchange(string curr1, string curr2, float amt, int userID);
+        Task<Ticker> GetExchangeRate(string curr1, string curr2);
     }
 }

@@ -21,15 +21,11 @@ namespace XChangeAPI.Data
             try
             {
                 const string sql = @"SELECT `HISTORY`.`id`,
-                                        `HISTORY`.`name`,
-                                        `HISTORY`.`abbreviation`,
-                                        `HISTORY`.`status`,
-                                        `HISTORY`.`checkedOn`,
-                                        `HISTORY`.`createdOn`,
-                                        `HISTORY`.`createdBy`,
-                                        `HISTORY`.`modifiedOn`,
-                                        `HISTORY`.`modifiedBy`,
-                                    FROM `conciergedb`.`HISTORY`
+                                        `HISTORY`.`ticker`,
+                                        `HISTORY`.`user`,
+                                        `HISTORY`.`timestamp`,
+                                        `HISTORY`.`status`
+                                    FROM `XCHANGE`.`HISTORY`
                                     ";
                 using (var conn = new MySqlConnection(_dbConn))
                 {
@@ -39,10 +35,79 @@ namespace XChangeAPI.Data
             }
             catch (Exception e)
             {
-
+                _logger.LogError(e.Message);
                 throw;
             }
 
+
+        }
+
+        public async Task<bool> IsUserThresholded(int userID)
+        {
+            try
+            {
+                const string sql = @"SELECT 
+                                        `HISTORY`.`timestamp`
+                                    FROM `XCHANGE`.`HISTORY`
+                                    WHERE user = @userID
+                                    AND status = 'A'
+                                    ORDER BY timestamp desc
+                                    LIMIT 9,1
+                                    ";
+                using (var conn = new MySqlConnection(_dbConn))
+                {
+                    var date = await conn.ExecuteScalarAsync<DateTime?>(sql, new { userID });
+                    if (!date.HasValue) return false; // not thresholded
+
+                    if (date.Value.AddMinutes(30) > DateTime.UtcNow) return true; //thresholded
+
+                    return false;
+
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                throw;
+            }
+
+        }
+
+        public async Task PostHistory(History history)
+        {
+            if (history is null)
+            {
+                throw new ArgumentNullException(nameof(history));
+            }
+
+            try
+            {
+                const string sql = @"INSERT INTO  `XCHANGE`.`HISTORY`
+                                    (
+                                        `ticker`,
+                                        `user`,
+                                        `timestamp`,
+                                        `status`
+                                    )
+                                    VALUES
+                                    (
+                                        @ticker,
+                                        @user,
+                                        @timestamp,
+                                        @status
+                                    )
+                                    ";
+                using (var conn = new MySqlConnection(_dbConn))
+                {
+                    await conn.ExecuteAsync(sql, new { history.ticker, history.user, history.timestamp, history.status });
+
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                throw;
+            }
 
         }
     }

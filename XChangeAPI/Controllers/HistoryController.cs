@@ -19,11 +19,49 @@ namespace XChangeAPI.Controllers
             _log = log;
         }
 
-        [HttpGet]
+        [HttpGet("user/{userID}")]
         public async Task<ActionResult<IEnumerable<History>>> GetHistoryByUser(int userID)
         {
-            return Ok(await _logic.GetHistoryByUser(userID));
+            try
+            {
+                return Ok(await _logic.GetHistoryByUser(userID));
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex.Message);
+                return BadRequest(ex.Message);
+            }
         }
 
+        [HttpGet("threshold/{userID}")]
+        public async Task<ActionResult<bool>> IsUserThresholded(int userID)
+        {
+            try
+            {
+                return Ok(await _logic.IsUserThresholded(userID));
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> PostHistory(History history)
+        {
+            if (history == null)
+                return BadRequest("Invalid request");
+            try
+            {
+                await _logic.PostHistory(history);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

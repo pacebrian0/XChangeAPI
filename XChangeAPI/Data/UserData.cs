@@ -27,8 +27,8 @@ namespace XChangeAPI.Data
                                         `User`.`createdBy`,
                                         `User`.`modifiedOn`,
                                         `User`.`modifiedBy`,
-                                        `User`.`password_hash` as passwordHash
-                                    FROM `conciergedb`.`User`
+                                        `User`.`passwordhash`
+                                    FROM `XCHANGE`.`User`
                                     ";
                 using (var conn = new MySqlConnection(_dbConn))
                 {
@@ -38,7 +38,7 @@ namespace XChangeAPI.Data
             }
             catch (Exception e)
             {
-
+                _logger.LogError(e.Message);
                 throw;
             }
 
@@ -56,7 +56,7 @@ namespace XChangeAPI.Data
                                         `User`.`modifiedOn`,
                                         `User`.`modifiedBy`,
                                         `User`.`passwordhash` 
-                                    FROM `TICKER`.`USER`
+                                    FROM `XCHANGE`.`USER`
                                     WHERE id=@id
                                     ";
                 using (var conn = new MySqlConnection(_dbConn))
@@ -67,7 +67,7 @@ namespace XChangeAPI.Data
             }
             catch (Exception e)
             {
-
+                _logger.LogError(e.Message);
                 throw;
             }
 
@@ -86,7 +86,7 @@ namespace XChangeAPI.Data
                                         `User`.`modifiedOn`,
                                         `User`.`modifiedBy`,
                                         `User`.`passwordhash`
-                                    FROM `TICKER`.`USER`
+                                    FROM `XCHANGE`.`USER`
                                     WHERE email=@email
                                     ";
                 using (var conn = new MySqlConnection(_dbConn))
@@ -97,7 +97,7 @@ namespace XChangeAPI.Data
             }
             catch (Exception e)
             {
-
+                _logger.LogError(e.Message);
                 throw;
             }
 
@@ -108,11 +108,12 @@ namespace XChangeAPI.Data
             try
             {
                 const string sql = @"
-                            INSERT INTO `TICKER`.`USER`
+                            INSERT INTO `XCHANGE`.`USER`
                             (
                             `name`,
                             `surname`,
                             `email`,
+                            `status`,
                             `createdOn`,
                             `createdBy`,
                             `modifiedOn`,
@@ -123,23 +124,24 @@ namespace XChangeAPI.Data
                             @name,
                             @surname,
                             @email,
+                            @status,
                             UTC_TIMESTAMP(),
                             0,
                             UTC_TIMESTAMP(),
                             0,
                             @passwordHash); 
-                            SELECT id from `TICKER`.`USER` where email = @email;";
+                            SELECT id from `XCHANGE`.`USER` where email = @email;";
 
                 using (var conn = new MySqlConnection(_dbConn))
                 {
-                    return await conn.ExecuteScalarAsync<int>(sql, new { user.name, user.surname, user.email, user.passwordhash });
+                    return await conn.ExecuteScalarAsync<int>(sql, new { user.name, user.surname, user.email, user.passwordhash, user.status });
                 }
 
 
             }
             catch (Exception e)
             {
-
+                _logger.LogError(e.Message);
                 throw;
             }
 
@@ -152,7 +154,7 @@ namespace XChangeAPI.Data
             try
             {
                 const string sql = @"
-                            UPDATE `TICKER`.`USER`
+                            UPDATE `XCHANGE`.`USER`
                             SET `name` = @name,
                                 `surname` = @surname,
                                 `email` = @email,
@@ -168,7 +170,7 @@ namespace XChangeAPI.Data
             }
             catch (Exception e)
             {
-
+                _logger.LogError(e.Message);
                 throw;
             }
 
@@ -179,7 +181,7 @@ namespace XChangeAPI.Data
             try
             {
                 const string sql = @"
-                            DELETE FROM `TICKER`.`USER`
+                            DELETE FROM `XCHANGE`.`USER`
                             WHERE id = @id";
                 using (var conn = new MySqlConnection(_dbConn))
                 {

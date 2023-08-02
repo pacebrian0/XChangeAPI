@@ -7,45 +7,71 @@ namespace XChangeAPI.Logic
 {
     public class TickerLogic : ITickerLogic
     {
-        private readonly ITickerData _data;
         private readonly IExchangeRateService _exchange;
         private readonly ILogger<TickerLogic> _log;
+        private readonly ICacheService _cache;
+        private readonly IHistoryLogic _history;
 
-        public TickerLogic(ITickerData data, IExchangeRateService exchangeservice, ILogger<TickerLogic> log)
+        public TickerLogic(IExchangeRateService exchangeservice, ILogger<TickerLogic> log, ICacheService cache, IHistoryLogic history)
         {
-            _data = data;
             _exchange = exchangeservice;
             _log = log;
+            _cache = cache;
+            _history = history;
         }
 
-        public async Task<IEnumerable<Ticker>> GetTickers()
-        {
-            return await _data.GetTickers();
-        }
 
-        public async Task<Ticker> GetExchangeRate(Currency curr1, Currency curr2)
+        public async Task<Ticker> GetExchangeRate(string curr1, string curr2)
         {
-            return await _data.GetExchangeRate(curr1.abbreviation, curr2.abbreviation);
-        }
-
-        public async Task<float> Exchange(Currency curr1, Currency curr2, float amt)
-        {
-            var exchangerate = await GetExchangeRate(curr1, curr2);
-
-            if ((int)DateTime.UtcNow.Subtract(exchangerate.checkedOn).TotalMinutes >= 30)
+            var cacheData = await _cache.GetData<Ticker>($"ticker{curr1}{curr2}");
+            if (cacheData != null)
             {
-                var newExchangeRate = await _exchange.GetExchangeRateFromAPI(curr1, curr2);
-                exchangerate.exchangerate = newExchangeRate;
-
+                return cacheData;
             }
-            return amt * exchangerate.exchangerate;
 
+            var rate = await _exchange.GetExchangeRateFromAPI(curr1, curr2);
+            cacheData = new Ticker
+            {
+                name = $"{curr1}/{curr2}",
+                checkedOn = DateTime.UtcNow,
+                currency1 = curr1,
+                currency2 = curr2,
+                exchangerate = rate
+
+
+            };
+
+            await _cache.SetData($"ticker{curr1}{curr2}", cacheData, DateTimeOffset.Now.AddMinutes(30));
+
+            return cacheData;
         }
 
-        public async Task UpdateExchangeRate(Currency curr1, Currency curr2, float rate)
+        public async Task<float?> Exchange(string curr1, string curr2, float amt, int userID)
         {
+            try
+            {
+                var userIsThresholded = await _history.IsUserThresholded(userID);
+                if (userIsThresholded) return null;
+
+                await _history.PostHistory(new History
+                {
+                    ticker = $"{curr1}/{curr2}",
+                    user = userID,
+                    timestamp = DateTime.UtcNow,
+                    status = 'A'
+                });
+                var exchangerate = await GetExchangeRate(curr1, curr2);
+                return amt * exchangerate.exchangerate;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex.Message);
+                throw;
+            }
+
 
         }
+
 
 
 

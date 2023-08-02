@@ -4,6 +4,7 @@ using XChangeAPI.Controllers.Interfaces;
 using XChangeAPI.Logic.Interfaces;
 using XChangeAPI.Models.DB;
 using XChangeAPI.Models.DTO;
+using XChangeAPI.Services.Interfaces;
 
 namespace XChangeAPI.Controllers
 {
@@ -13,27 +14,52 @@ namespace XChangeAPI.Controllers
     public class TickerController : ControllerBase, ITickerController
     {
         private readonly ITickerLogic _logic;
-        public TickerController(ITickerLogic logic)
+        private readonly ILogger<TickerController> _logger;
+
+        public TickerController(ITickerLogic logic, ILogger<TickerController> logger)
         {
             _logic = logic;
+            _logger = logger;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Ticker>>> GetTickers()
-        {
-            return Ok(await _logic.GetTickers());
-        }
 
-        [HttpGet("exchangerate")]
+        [HttpPost("exchangerate")]
         public async Task<ActionResult<Ticker>> GetExchangeRate([FromBody] ExchangeRateDTO dto)
         {
-            return Ok(await _logic.GetExchangeRate(dto.currency1, dto.currency2));
+            if (dto == null)
+                return BadRequest("Invalid request");
+
+            try
+            {
+                return Ok(await _logic.GetExchangeRate(dto.currency1.ToUpper(), dto.currency2.ToUpper()));
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("exchange")]
-        public async Task<ActionResult<float>> Exchange([FromBody] ExchangeDTO dto)
+        public async Task<ActionResult<string>> Exchange([FromBody] ExchangeDTO dto)
         {
-            return Ok(await _logic.Exchange(dto.currency1, dto.currency2, dto.amount));
+            if (dto == null)
+                return BadRequest("Invalid request");
+
+            try
+            {
+                var result = await _logic.Exchange(dto.currency1.ToUpper(), dto.currency2.ToUpper(), dto.amount, dto.userID);
+                if (!result.HasValue)
+                {
+                    return BadRequest("Rate Limit exceeded!");
+                }
+                return Ok(result.Value.ToString("0.00"));
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
         }
     }

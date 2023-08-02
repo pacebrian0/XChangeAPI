@@ -4,6 +4,6 @@ namespace XChangeAPI.Services.Interfaces
 {
     public interface IExchangeRateService
     {
-        Task<float> GetExchangeRateFromAPI(Currency curr1, Currency curr2);
+        Task<float> GetExchangeRateFromAPI(string curr1, string curr2);
     }
 }

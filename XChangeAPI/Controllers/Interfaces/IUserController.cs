@@ -10,6 +10,7 @@ namespace XChangeAPI.Controllers.Interfaces
         Task<IEnumerable<User>> GetUser();
         Task<ActionResult<User>> GetUserById(int id);
         Task<ActionResult<UserResponseDTO>> Login(UserLoginDTO request);
+        Task<ActionResult<User>> PostUser(UserPost user);
         Task<ActionResult<UserResponseDTO>> Register(UserRegisterDTO request);
         Task<ActionResult<User>> UpdateUser(UserPut User);
     }

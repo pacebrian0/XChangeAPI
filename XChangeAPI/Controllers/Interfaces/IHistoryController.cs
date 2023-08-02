@@ -6,5 +6,7 @@ namespace XChangeAPI.Controllers.Interfaces
     public interface IHistoryController
     {
         Task<ActionResult<IEnumerable<History>>> GetHistoryByUser(int userID);
+        Task<ActionResult<bool>> IsUserThresholded(int userID);
+        Task<ActionResult> PostHistory(History history);
     }
 }

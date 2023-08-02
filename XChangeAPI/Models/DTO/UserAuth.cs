@@ -2,7 +2,7 @@
 {
     public class UserRegisterDTO
     {
-        public required string Username { get; set; }
+        public required string Email { get; set; }
         public required string Password { get; set; }
         public required string Name { get; set; }
         public required string Surname { get; set; }
@@ -16,7 +16,7 @@
 
     public class UserLoginDTO
     {
-        public required string Username { get; set; }
+        public required string Email { get; set; }
         public required string Password { get; set; }
 
     }
@@ -27,7 +27,6 @@
         public string surname { get; set; } = string.Empty;
         public string password { get; set; } = string.Empty;
         public string email { get; set; } = string.Empty;
-        public string createdBy { get; set; } = string.Empty;
 
 
     }

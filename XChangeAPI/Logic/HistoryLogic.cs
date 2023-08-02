@@ -21,5 +21,14 @@ namespace XChangeAPI.Logic
             return await _data.GetHistoryByUser(userID);
         }
 
+        public async Task<bool> IsUserThresholded(int userID)
+        {
+            return await _data.IsUserThresholded(userID);
+        }
+
+        public async Task PostHistory(History history)
+        {
+            await _data.PostHistory(history);
+        }
     }
 }

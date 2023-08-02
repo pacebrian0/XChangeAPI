@@ -6,7 +6,7 @@
 
         public BaseDatabase(IConfiguration configuration)
         {
-            _dbConn = configuration.GetConnectionString("connString") ?? throw new Exception("Please set up connection strings");
+            _dbConn = configuration.GetConnectionString("sqlConnString") ?? throw new Exception("Please set up connection strings");
         }
     }
 }

@@ -6,8 +6,7 @@ namespace XChangeAPI.Controllers.Interfaces
 {
     public interface ITickerController
     {
-        Task<ActionResult<float>> Exchange([FromBody] ExchangeDTO dto);
+        Task<ActionResult<string>> Exchange([FromBody] ExchangeDTO dto);
         Task<ActionResult<Ticker>> GetExchangeRate([FromBody] ExchangeRateDTO dto);
-        Task<ActionResult<IEnumerable<Ticker>>> GetTickers();
     }
 }
