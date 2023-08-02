@@ -1,0 +1,58 @@
+version: '3.8'
+services:
+  redis_xchange:
+    container_name: redis_xchange
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 20 1 --loglevel debug 
+    volumes: 
+      - ${DOCKERPATH}/redis/cache:/data
+    networks:
+      network:
+        ipv4_address: 10.2.0.2
+
+  mariadb_xchange:
+      image: mariadb
+      container_name: mariadb_xchange
+      restart: always
+      environment:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_DATABASE: XCHANGE
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      volumes:
+        - ${DOCKERPATH}/mariadb:/var/lib/mysql
+        - ./mariainit:/docker-entrypoint-initdb.d
+      ports:
+        - 3306:3306
+      networks:
+        network:
+          ipv4_address: 10.2.0.3
+
+  adminer_xchange:
+    container_name: adminer_xchange
+    image: adminer
+    restart: always
+    ports:
+      - 8123:8080
+    networks:
+      network:
+        ipv4_address: 10.2.0.4
+
+
+
+volumes:
+  cache:
+    driver: local
+
+
+networks:
+  network:
+    driver: bridge
+    name: xchangenetwork
+    ipam:
+      config:
+        - subnet: 10.2.0.0/16
+          gateway: 10.2.0.1
