@@ -6,7 +6,7 @@ This is the XChange currency converter, a demo project meant as an interview tes
 
 1) Open a terminal window at 'Docker/', modify the .env file and run 'docker compose up -d' in that specific location. This will generate redis, mariadb and adminer containers.
 
-2) Go back to the root directory, navigate to XChangeAPI/XChangeAPI and fill in the details inside the appsettings. There are three locations to modify:
+2) Go back to the root directory, navigate to XChangeAPI and fill in the details inside the appsettings. There are three locations to modify:
 	a) APIToken: User-specific API token provided by fixer.io
 	b) JWTToken: A random string of characters to uniquely identify the application login token.
 	c) sqlConnString: Fill in your username and password that was entered in step 1 in the .env file.
